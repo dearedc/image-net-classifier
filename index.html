@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload & Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Reset and Basic Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            width: 100%;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+        }
+
+        /* Card Title */
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f7f7f7;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Result Card */
+        .result-card {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .uploaded-image {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* Layout Adjustments for Side-by-Side Cards */
+        .upload-card, .result-display-card {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Upload Image for Prediction</h2>
+
+        <!-- Upload Card -->
+        <div class="card upload-card">
+            <div class="card-title">Upload Image</div>
+            <form id="uploadForm" action="/" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="file" id="file" required>
+                </div>
+                <button type="button" onclick="uploadImage()">Upload</button>
+            </form>
+        </div>
+
+        <!-- Result Display Card -->
+        <div class="card result-display-card">
+            <div id="imagePreview" style="display: none;">
+                <img id="uploadedImage" class="uploaded-image" src="" alt="Uploaded Image">
+            </div>
+
+            <div id="resultCard" class="result-card">
+                <p id="predictedClass"></p>
+                <p id="accuracy"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            var form = document.querySelector("form");
+            var formData = new FormData(form);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display prediction result
+                document.getElementById('predictedClass').textContent = `Predicted Class: ${data.predicted_class}`;
+                document.getElementById('accuracy').textContent = `Accuracy: ${data.accuracy}%`;
+
+                // Show result card
+                document.getElementById('resultCard').classList.add('show');
+
+                // Display uploaded image preview
+                var imagePreview = document.getElementById('imagePreview');
+                var uploadedImage = document.getElementById('uploadedImage');
+                uploadedImage.src = URL.createObjectURL(formData.get('file'));
+                imagePreview.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+</body>
+</html>
